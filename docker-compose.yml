@@ -1,0 +1,79 @@
+version: '3.4'
+
+x-logging:
+  &default-logging
+  options:
+    max-size: '10m'
+    max-file: '5'
+  driver: json-file
+
+services:
+  jira:
+    depends_on:
+      - postgresql
+    image: "teamatldocker/jira:8.2.3"
+    restart: unless-stopped
+    environment:
+      JIRA_DATABASE_URL: postgresql://jira@postgresql/jiradb
+      JIRA_DB_PASSWORD: ${JIRA_DB_PASSWORD}
+      SETENV_JVM_MINIMUM_MEMORY: ${JVM_MINIMUM_MEMORY:-2048m}
+      SETENV_JVM_MAXIMUM_MEMORY: ${JVM_MAXIMUM_MEMORY:-4096m}
+      JIRA_PROXY_NAME: ${JIRA_PROXY_NAME}
+      JIRA_PROXY_PORT: ${JIRA_PROXY_PORT}
+      JIRA_PROXY_SCHEME: ${JIRA_PROXY_SCHEME}
+    ports:
+     - "8080:8080"
+    volumes:
+      - "${BASE_PATH:-/data}/jira:/var/atlassian/jira"
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.backend=jira"
+      - "traefik.docker.network=web"
+      - "traefik.enable=true"
+      - "traefik.port=8080"
+      - ${JIRA_URL_CONFIG:-traefik.frontend.rule=Host:jira.naturalis.nl}
+
+  postgresql:
+    image: "postgres:9.5-alpine"
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-jira}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-jiradb}
+      POSTGRES_ENCODING: ${POSTGRES_ENCODING:-UNICODE}
+      POSTGRES_COLLATE: ${POSTGRES_COLLATE:-C}
+      POSTGRES_COLLATE_TYPE: ${POSTGRES_COLLATE_TYPE:-C}
+    logging: *default-logging
+    networks:
+      - default
+    volumes:
+    - "${BASE_PATH:-/data}/postgresqldata:/var/lib/postgresql"
+
+  traefik:
+    image: traefik:1.7.12
+    restart: unless-stopped
+    environment: 
+      - TRANSIP_PRIVATE_KEY_PATH=/.transip.key
+      - TRANSIP_ACCOUNT_NAME=${TRANSIP_ACCOUNT_NAME:-naturalis}
+    ports:
+      - 80:80
+      - 443:443
+      - 8081:8080
+    networks:
+      - web
+      - default
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${TRAEFIK_TOML_FILE:-./traefik.toml}:/traefik.toml
+      - ./.transip.key:/.transip.key
+      - ./acme.json:/acme.json
+    logging: *default-logging
+
+
+# run docker network create web before
+networks:
+  web:
+    external: true
+
