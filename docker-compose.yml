@@ -11,7 +11,7 @@ services:
   jira:
     depends_on:
       - postgresql
-    image: "teamatldocker/jira:8.2.3"
+    image: "teamatldocker/jira:8.4.0"
     restart: unless-stopped
     environment:
       JIRA_DATABASE_URL: postgresql://jira@postgresql/jiradb
