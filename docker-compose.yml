@@ -11,7 +11,7 @@ services:
   jira:
     depends_on:
       - postgresql
-    image: "teamatldocker/jira:8.4.0"
+    image: "teamatldocker/jira:8.4.1"
     restart: unless-stopped
     environment:
       JIRA_DATABASE_URL: postgresql://jira@postgresql/jiradb
@@ -49,7 +49,7 @@ services:
     networks:
       - default
     volumes:
-    - "${BASE_PATH:-/data}/postgresqldata:/var/lib/postgresql"
+    - "${BASE_PATH:-/data}/postgresqldata:/var/lib/postgresql/data"
 
   traefik:
     image: traefik:1.7.12
