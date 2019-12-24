@@ -18,10 +18,8 @@ echo "$(date '+%Y-%m-%d %H:%M:%S') -- Stopping jira container to avoid access to
 /usr/local/bin/docker-compose stop jira
 
 # move db file
-echo "$(date '+%Y-%m-%d %H:%M:%S') --Move data to volume location in container"
+echo "$(date '+%Y-%m-%d %H:%M:%S') -- Move data to volume location in container"
 mv /var/backup/pgsql/pgsql_jiradb.dump /data/postgresqldata/pgsql_jiradb.dump
-
-pgsql_jiradb.dump
 
 # import db
 echo "$(date '+%Y-%m-%d %H:%M:%S') -- Importing dumpfile"
