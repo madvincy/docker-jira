@@ -18,28 +18,28 @@ echo "$(date '+%Y-%m-%d %H:%M:%S') -- Stopping jira container to avoid access to
 /usr/local/bin/docker-compose stop jira
 
 # move db file
-echo "$(date '+%Y-%m-%d %H:%M:%S') --Move data to volume location in container
+echo "$(date '+%Y-%m-%d %H:%M:%S') --Move data to volume location in container"
 mv /var/backup/pgsql/pgsql_jiradb.dump /data/postgresqldata/pgsql_jiradb.dump
+
+pgsql_jiradb.dump
 
 # import db
 echo "$(date '+%Y-%m-%d %H:%M:%S') -- Importing dumpfile"
 /usr/local/bin/docker-compose exec postgresql pg_restore /var/lib/postgresql/data/pgsql_jiradb.dump -c -d ${POSTGRES_DB} -U ${POSTGRES_USER} 
 
 # move db file back
-echo "$(date '+%Y-%m-%d %H:%M:%S') --Move data to original location
+echo "$(date '+%Y-%m-%d %H:%M:%S') -- Move data to original location"
 mv /data/postgresqldata/pgsql_jiradb.dump /var/backup/pgsql/pgsql_jiradb.dump
 
 # rsync data from production  Add ssh key if needed
+echo "$(date '+%Y-%m-%d %H:%M:%S') -- prepare rsync, run ssh-keyscan if needed"
 if ! grep "$(ssh-keyscan ${RSYNC_SOURCE} 2>/dev/null)" /root/.ssh/known_hosts > /dev/null; then
     /usr/bin/ssh-keyscan ${RSYNC_SOURCE} >> /root/.ssh/known_hosts
 fi
 
-# touch log and set permissions
-mkdir -p /var/log/jira
-touch /var/log/jira/rsync_data.log
-
 # rsync with --delete option, without compression. 
-/usr/bin/rsync -avh -e 'ssh -i .jirarsync.key' --no-owner --no-group --delete --log-file=/var/log/jira/rsync_data.log jirarsync@${RSYNC_SOURCE}:/data/jira/data /data/jira/data
+echo "$(date '+%Y-%m-%d %H:%M:%S') -- Rsync data folder"
+/usr/bin/rsync -avh -e 'ssh -i .jirarsync.key' --no-owner --no-group --delete jirarsync@${RSYNC_SOURCE}:/data/jira/data /data/jira/data
 
 # start Jira
 echo "$(date '+%Y-%m-%d %H:%M:%S') -- Starting Jira"
