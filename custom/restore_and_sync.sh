@@ -37,7 +37,7 @@ fi
 
 # rsync with --delete option, without compression. 
 echo "$(date '+%Y-%m-%d %H:%M:%S') -- Rsync data folder"
-/usr/bin/rsync -avh -e 'ssh -i .jirarsync.key' --no-owner --no-group --delete jirarsync@${RSYNC_SOURCE}:/data/jira/data /data/jira/data
+/usr/bin/rsync -avh -e 'ssh -i .jirarsync.key' --no-owner --no-group --delete jirarsync@${RSYNC_SOURCE}:/data/jira/data /data/jira
 
 # start Jira
 echo "$(date '+%Y-%m-%d %H:%M:%S') -- Starting Jira"
