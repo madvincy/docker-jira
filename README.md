@@ -6,7 +6,10 @@ Docker compose file for running jira
 
 Contents
 -------------
+docker-compose file, traefik and .env template for running Jira 
 
+Remark:
+SETENV_JVM_SUPPORT_RECOMMENDED_ARGS environment is used to be able to set the -XX:ReservedCodeCacheSize= parameter in Java. This should be possible using the SETENV_JVM_CODE_CACHE_ARGS but the entrypoint script which modifies the /opt/jira/bin/setenv.sh file does not seem to like space separated values. 
 
 
 Instruction building image
