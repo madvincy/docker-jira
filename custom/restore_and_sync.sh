@@ -23,7 +23,7 @@ mv /var/backup/pgsql/pgsql_jiradb.dump /data/postgresqldata/pgsql_jiradb.dump
 
 # import db
 echo "$(date '+%Y-%m-%d %H:%M:%S') -- Importing dumpfile"
-/usr/local/bin/docker-compose exec postgresql pg_restore /var/lib/postgresql/data/pgsql_jiradb.dump -c -d ${POSTGRES_DB} -U ${POSTGRES_USER} 
+/usr/local/bin/docker-compose exec -T postgresql pg_restore /var/lib/postgresql/data/pgsql_jiradb.dump -c -d ${POSTGRES_DB} -U ${POSTGRES_USER} 
 
 # move db file back
 echo "$(date '+%Y-%m-%d %H:%M:%S') -- Move data to original location"
